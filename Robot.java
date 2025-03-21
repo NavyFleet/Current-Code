@@ -10,6 +10,8 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.button.CommandPS4Controller;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -38,7 +40,7 @@ public class Robot extends TimedRobot {
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
   //controllers
   private DifferentialDrive m_myRobot;
-  private Joystick j_Driver; //driver controller
+  private CommandXboxController j_Driver; //driver controller
   private Joystick j_Elevator; //Elevator controller
   //motor ID #s
   private static final int rightFrontDriveeID = 1;
@@ -104,10 +106,11 @@ public class Robot extends TimedRobot {
     m_myRobot = new DifferentialDrive(m_leftFront::set, m_rightFront::set);
 
     //driver channel stuff
-    j_Driver = new Joystick(0);
+    j_Driver = new CommandXboxController(0);
     j_Elevator = new Joystick(1);
-    j_Driver.setXChannel(2);
-    j_Driver.setYChannel(1);
+   //j_Driver.setXChannel(2);
+    //j_Driver.setXChannel(3);
+    //j_Driver.setYChannel(1);
     j_Elevator.setXChannel(5);
 
     //kraken limits
@@ -273,27 +276,33 @@ public class Robot extends TimedRobot {
   public void teleopPeriodic() { 
     SmartDashboard.putNumber("Pivot Read Out", encoder.get()); //read out encoder pos
     SmartDashboard.putNumber("Elevator", elevatorEncoder.getPosition());
-    SmartDashboard.putNumber("Y", -j_Driver.getY());
-    SmartDashboard.putNumber("X", -j_Driver.getX());
+   // SmartDashboard.putNumber("Y", -j_Driver.getY());
+   // SmartDashboard.putNumber("X", -j_Driver.getX());
     SmartDashboard.putBoolean("Laser", laser.get());
     SmartDashboard.putBoolean("Laser2", laser2.get());
     //SmartDashboard.putNumber("Shooter", shooterSpeed);
     elevatorPos = elevatorEncoder.getPosition();
     //kraken stuff
-    m_myRobot.arcadeDrive(-j_Driver.getY()*.25, -j_Driver.getX()*.25);
 
-    /* //leftOut.Output = fwd + rot;
-    rightOut.Output = fwd - rot;
-    m_leftFront.setControl(leftOut);
-    m_rightFront.setControl(rightOut);
+    //NEW DRIVE CODE, VERY IMPORTANT
+    double xSpeed = j_Driver.getLeftY();
+    double zRotation = j_Driver.getRightX();
+    m_myRobot.arcadeDrive(-xSpeed*.80, -zRotation*.80);
+  //  System.out.println("speed: " + xSpeed + " rot: " + zRotation);
+
+   //leftOut.Output = fwd + rot;
+   //rightOut.Output = fwd - rot;
+  //  m_leftFront.setControl(leftOut);
+  //  m_rightFront.setControl(rightOut);
     //drive mode
-    if(j_Driver.getRawButton(6)){//nitrous active
-      fwd = -j_Driver.getY()*.35;
-      rot = j_Driver.getX()*0.3;
-    }else{//regular mode
-      fwd = -j_Driver.getY()*0.25;
-      rot = j_Driver.getX()*0.2;
-    } */
+    //if(j_Driver.getRawButton(6)){//nitrous active
+      //fwd = -j_Driver.getY()*.35;
+      //rot = j_Driver.getX()*0.3;
+    //}else{//regular mode
+     // fwd = -j_Driver.getY()*0.25;
+      //rot = j_Driver.getX()*0.2;
+     // System.out.println("fwd: " + fwd + " rot: " + rot);
+    //} */
     //intake note
     //if(m_Arm.getRawButton(1)){
       //if(laser.get() == laser2.get()){
@@ -347,39 +356,39 @@ public class Robot extends TimedRobot {
       elevator_preset = 0;
     }
     if(elevator_preset == 0){
-      if(elevatorEncoder.getPosition() > -30){
+      if(elevatorEncoder.getPosition() > 0){
         m_Elevator.set(-1);
       }else{
         m_Elevator.set(0);
       }
     }else if(elevator_preset == 1){
-      if(elevatorEncoder.getPosition() < -15){
+      if(elevatorEncoder.getPosition() < 15){
         m_Elevator.set(1);
-      }else if(elevatorEncoder.getPosition() > -15){
+      }else if(elevatorEncoder.getPosition() > 15){
         m_Elevator.set(-1);
       }else{
         m_Elevator.set(0);
       }
     }else if(elevator_preset == 2){
-      if(elevatorEncoder.getPosition() < 4){
+      if(elevatorEncoder.getPosition() < 19){
         m_Elevator.set(1);
-      }else if(elevatorEncoder.getPosition() > 4){
+      }else if(elevatorEncoder.getPosition() > 19){
         m_Elevator.set(-1);
       }else{
         m_Elevator.set(0);
       }
     }else if(elevator_preset == 3){
-      if(elevatorEncoder.getPosition() < 23){
+      if(elevatorEncoder.getPosition() < 42){
         m_Elevator.set(1);
-      }else if(elevatorEncoder.getPosition() > 23){
+      }else if(elevatorEncoder.getPosition() > 42){
         m_Elevator.set(-1);
       }else{
         m_Elevator.set(0);
       }
     }else if(elevator_preset == 4){
-      if(elevatorEncoder.getPosition() < 42){
+      if(elevatorEncoder.getPosition() < 61){
         m_Elevator.set(1);
-      }else if(elevatorEncoder.getPosition() > 42){
+      }else if(elevatorEncoder.getPosition() > 61){
         m_Elevator.set(-1);
       }else{
         m_Elevator.set(0);
